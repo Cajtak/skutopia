@@ -19,22 +19,6 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
       - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
-  import_csv:
-    container_name: postgres_helper_test
-    image: postgres:14.1-alpine
-    command:
-    - sh
-    - -c
-    - |
-      while ! pg_isready -d worldbank_api_db -U postgres -h db -p 5432 -q -d worldbank_api_db -U postgres -h db -p 5432 -q; do echo 'postgres still not up' ; sleep 10; done
-      if [ $(psql postgres://postgres:postgres@db:5432/worldbank_api_db -tAc "SELECT COUNT(*) FROM worldbank_api") -eq 0 ]
-      then
-        psql postgres://postgres:postgres@db:5432/worldbank_api_db -c "\copy worldbank_api FROM '/var/lib/postgresql/csv/worldbank_api.csv' DELIMITER ',' CSV HEADER;"
-      fi
-    depends_on:
-      - db
-    volumes:
-      - ./worldbank_api.csv:/var/lib/postgresql/csv/worldbank_api.csv
 volumes:
   db:
     driver: local
