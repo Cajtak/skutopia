@@ -1,14 +1,36 @@
-name: Docker Image CI
+name: CI
 
 on: push
 
+env:
+  RAILS_ENV: test
+  RACK_ENV: test
+  DATABASE_HOST: "127.0.0.1"
+  REDIS_URL: "redis://127.0.0.1"
+
 jobs:
-
-  build:
-
+  ci:
     runs-on: ubuntu-latest
     
+    services:
+      db:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: its_a_secret
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+          # volume for bind mount removed!
+          # assign the container a predictable name
+        options: --name myapp_db
+      redis:
+        image: redis:6
+        ports:
+          - 6379:6379
+
     steps:
-    - uses: actions/checkout@v1
-    - name: Build the docker-compose stack
-      run: docker-compose -f docker-compose.yml up
+      - name: Checkout source
+        uses: actions/checkout@v1
+
+      - name: Create role
+        run: docker exec myapp_db bash -c "PGPASSWORD=shhhhh psql -U postgres -c \"create role myapp with createdb login password 'myapp'\""
