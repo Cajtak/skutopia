@@ -2,32 +2,37 @@ name: schedule_dbt_job
 
 on: push
 
-env:
-  POSTGRES_USER: postgres
-  POSTGRES_PASSWORD: postgres
-  POSTGRES_DB: worldbank_api_db
-
 jobs:
-  schedule_dbt_run:
-    name: schedule_dbt_run
+  container-job:
+    # Containers must run in Linux based operating systems
     runs-on: ubuntu-latest
-
+    # Docker Hub image that `container-job` executes in
+    container: node:10.18-jessie
+    
+    services:
+      postgres:
+        image: postgres:14.1-alpine
+        env: 
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: worldbank_api_db
     steps:
-    - name: Check out
-      uses: actions/checkout@master
+      # Downloads a copy of the code in your repository before running CI tests
+      - name: Check out repository code
+        uses: actions/checkout@v3
 
-    - uses: actions/setup-python@v1
-      with:
-        python-version: "3.7.x"
+      # Performs a clean installation of all dependencies in the `package.json` file
+      # For more information, see https://docs.npmjs.com/cli/ci.html
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Install dependencies
-      run: |
-        pip install dbt-postgres
-        dbt deps
-
-    # dbt related commands here - run use --target prod/dev to run for specific environments
-    - name: Run dbt models
-      run: dbt run
-
-    - name: Test dbt models
-      run: dbt test
+      - name: Connect to PostgreSQL
+        # Runs a script that creates a PostgreSQL table, populates
+        # the table with data, and then retrieves the data.
+        run: node client.js
+        # Environment variables used by the `client.js` script to create a new PostgreSQL table.
+        env:
+          # The hostname used to communicate with the PostgreSQL service container
+          POSTGRES_HOST: postgres
+          # The default PostgreSQL port
+          POSTGRES_PORT: 5432
