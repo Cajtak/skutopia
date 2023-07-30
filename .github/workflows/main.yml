@@ -1,14 +1,7 @@
 name: schedule_dbt_job
 
-on:
-schedule:
-   # run at 7AM every single day
-   # https://crontab.guru <-- for generating CRON expression
-   - cron: "0 7 * * *"
-push:
-   branches:
-   # run on push to dev branch
-   - dev
+on: push
+
 env:
 postgres:
   image: postgres:14.1-alpine
