@@ -1,0 +1,14 @@
+my_dbt_project:
+  outputs:
+
+    dev:
+      type: postgres
+      threads: 4
+      host: db
+      port: 5432
+      user: postgres
+      pass: postgres
+      dbname: worldbank_api_db
+      schema: public
+
+  target: dev
