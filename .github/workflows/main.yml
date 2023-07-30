@@ -13,7 +13,7 @@ postgres:
     - "5440:5440"
 
 jobs:
-schedule_dbt_run:
+  schedule_dbt_run:
     name: schedule_dbt_run
     runs-on: ubuntu-latest
 
