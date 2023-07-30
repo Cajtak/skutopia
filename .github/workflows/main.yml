@@ -3,14 +3,9 @@ name: schedule_dbt_job
 on: push
 
 env:
-postgres:
-  image: postgres:14.1-alpine
-  env:
-    POSTGRES_USER: postgres
-    POSTGRES_PASSWORD: postgres
-    POSTGRES_DB: worldbank_api_db
-  ports:
-    - "5440:5440"
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_DB: worldbank_api_db
 
 jobs:
   schedule_dbt_run:
